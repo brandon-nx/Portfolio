@@ -1,41 +1,52 @@
 <?php
-  /**
-  * Requires the "PHP Email Form" library
-  * The "PHP Email Form" library is available only in the pro version of the template
-  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
-  * For more info and help: https://bootstrapmade.com/php-email-form/
-  */
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'contact@example.com';
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
 
-  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
-    include( $php_email_form );
-  } else {
-    die( 'Unable to load the "PHP Email Form" Library!');
-  }
+// Replace with your real receiving email address
+$receiving_email_address = 'brandonting.qwe@gmail.com';
 
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = htmlspecialchars($_POST['name']);
+    $email = htmlspecialchars($_POST['email']);
+    $subject = htmlspecialchars($_POST['subject']);
+    $message = htmlspecialchars($_POST['message']);
 
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'example.com',
-    'username' => 'example',
-    'password' => 'pass',
-    'port' => '587'
-  );
-  */
+    if (!empty($name) && !empty($email) && !empty($subject) && !empty($message)) {
+        $mail = new PHPMailer(true);
 
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
+        try {
+            //Server settings
+            $mail->SMTPDebug = 0;                                        // Disable verbose debug output
+            $mail->isSMTP();                                             // Set mailer to use SMTP
+            $mail->Host       = 'smtp.gmail.com';                        // Specify main and backup SMTP servers
+            $mail->SMTPAuth   = true;                                    // Enable SMTP authentication
+            $mail->Username   = 'brandonting.qwe@gmail.com';                  // SMTP username
+            $mail->Password   = 'hwur lmsw gjjb pdpo';                     // SMTP password (use App Password if 2FA is enabled)
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;          // Enable TLS encryption, `PHPMailer::ENCRYPTION_SMTPS` also accepted
+            $mail->Port       = 587;                                     // TCP port to connect to
 
-  echo $contact->send();
+            //Recipients
+            $mail->setFrom($email, $name);
+            $mail->addAddress($receiving_email_address);                 // Add a recipient
+
+            // Content
+            $mail->isHTML(true);                                         // Set email format to HTML
+            $mail->Subject = $subject;
+            $mail->Body    = "Name: $name<br>Email: $email<br>Message: $message";
+
+            $mail->send();
+            echo 'Your message has been sent. Thank you!';
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+    } else {
+        echo "All fields are required.";
+    }
+} else {
+    echo "Invalid request.";
+}
 ?>
