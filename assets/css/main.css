@@ -420,6 +420,12 @@ h6 {
   color: color-mix(in srgb, var(--default-color), transparent 30%);
 }
 
+
+.justify-text {
+  text-align: justify;
+}
+
+
 /*--------------------------------------------------------------
 # Preloader
 --------------------------------------------------------------*/
